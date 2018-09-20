@@ -1,6 +1,6 @@
 var StaticServer = require('static-server');
 var server = new StaticServer({
-  rootPath: './media/static/',            // required, the root of the server file tree
+  rootPath: '/srv/media/static/',            // required, the root of the server file tree
   port: 1337,               // required, the port to listen
   name: 'media-static-server',   // optional, will set "X-Powered-by" HTTP header
   //host: '10.0.0.100',       // optional, defaults to any interface
