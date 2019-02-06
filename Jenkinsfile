@@ -2,7 +2,10 @@ pipeline {
   agent {
     docker {
       image "node:8.12.0-stretch"
-      args "--name media-service --network restaurantetic -p 9090:9090"
+      args "--name media-service \
+            --network restaurantetic \
+            -p 9090:9090 \
+            -v /var/www/media.unixjs.com.co/files:/app/files"
     }
   }
   stages {
