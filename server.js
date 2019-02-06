@@ -1,60 +1,40 @@
-var StaticServer = require('static-server');
-var server = new StaticServer({
-  rootPath: '/srv/media/static/',            // required, the root of the server file tree
-  port: 1337,               // required, the port to listen
-  name: 'media-static-server',   // optional, will set "X-Powered-by" HTTP header
-  //host: '10.0.0.100',       // optional, defaults to any interface
-  host: '127.0.0.1',
-  cors: '*',                // optional, defaults to undefined
-  followSymlink: true,      // optional, defaults to a 404 error
-  templates: {
-    index: 'foo.html',      // optional, defaults to 'index.html'
-    notFound: '404.html'    // optional, defaults to undefined
+const express = require("express");
+const fileUpload = require('express-fileupload');
+const moment = require("moment-timezone");
+const app = express();
+const port = 9090;
+
+app.use(fileUpload({
+  limits: { 
+    files: 1,
+    fileSize: 64 * 1024 * 1024,
+  },
+}));
+
+const secs = new Map();
+
+app.post("/upload", async (req, res) => {
+  if (req.get("x-access-key") !== "MAJE@O93I2G5#XX074*!") {
+    return await res.status(401).send("Wrog key or not suplied.");
+  }
+  try {
+    if (Object.values(req.files).length > 1){
+      return await res.send("Error maximum number of files.");
+    }
+    const key = moment().tz("America/Bogota").format("YYYYMMDD");
+    if (!secs.get(key)) {
+      secs.set(key, Number(key + "0000"));
+    } 
+    const next = secs.get(key) + 1;
+    secs.set(key, next);
+    const listFileName = req.files.file.name.split(".");
+    await req.files.file.mv(`./files/${next.toString()}.${listFileName[listFileName.length - 1]}`);
+    await res.send("uploaded.");
+  } catch (err) {
+    await res.send("Error processing files, send only one file.");
   }
 });
- 
-server.start(function () {
-  console.log('Server listening to', server.port);
-});
- 
-server.on('request', function (req, res) {
-  // req.path is the URL resource (file name) from server.rootPath
-  // req.elapsedTime returns a string of the request's elapsed time
-});
- 
-server.on('symbolicLink', function (link, file) {
-  // link is the source of the reference
-  // file is the link reference
-  console.log('File', link, 'is a link to', file);
-});
- 
-server.on('response', function (req, res, err, file, stat) {
-  // res.status is the response status sent to the client
-  // res.headers are the headers sent
-  // err is any error message thrown
-  // file the file being served (may be null)
-  // stat the stat of the file being served (is null if file is null)
- 
-  // NOTE: the response has already been sent at this point
-});
 
-/*
-const { NodeMediaServer } = require('node-media-server');
+app.use(express.static("files"));
 
-const config = {
-    rtmp: {
-        port: 1935,
-        chunk_size: 60000,
-        gop_cache: true,
-        ping: 60,
-        ping_timeout: 30
-      },
-      http: {
-        port: 8000,
-        allow_origin: '*'
-    }
-};
-
-var nms = new NodeMediaServer(config);
-nms.run();
-*/
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
