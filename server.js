@@ -31,7 +31,7 @@ app.post("/upload", async (req, res) => {
     await req.files.file.mv(`./files/${next.toString()}.${listFileName[listFileName.length - 1]}`);
     await res.send("uploaded.");
   } catch (err) {
-    await res.send("Error processing files, send only one file.");
+    await res.send("Error processing file. " + err.message);
   }
 });
 
