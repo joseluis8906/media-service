@@ -27,6 +27,8 @@ mongoose.connect("mongodb://mongo/MEDIA_SERVICE", {useNewUrlParser: true});
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
 
+app.use(express.static("/app/files"));
+
 app.post("/upload", async (req, res) => {
   if (req.get("x-access-key") !== "MAJE@O93I2G5#XX074*!") {
     return await res.status(401).send("Wrog key or not suplied.");
@@ -65,6 +67,10 @@ app.get("/find", async (req, res) => {
     return await res.status(401).send("Wrog key or not suplied.");
   }
   return await res.json(await FileModel.find({}, {name: 1, _id: 0}));
+});
+
+app.get("/", async (_, res) => {
+  return await res.send("media server");
 });
 
 app.use(express.static("files"));
