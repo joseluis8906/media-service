@@ -11,11 +11,11 @@ pipeline {
   stages {
     stage ("Build") {
       steps {
-        sh "npm install"
+        sh "npm install && npm run build"
       }
     }
     stage ("Run") {
-      steps {
+      steps { 
         sh "npm run serve&"
         input message: "Finished using the web site? (Click \"Proceed\" to continue)"
       }
