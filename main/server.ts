@@ -12,7 +12,7 @@ import { FileSchema } from "./fileSchema";
 const app = express();
 const port = 9090;
 const redisAsync: any = bluebird.promisifyAll(redis);
-const redisClient = redisAsync.createClient({host: "redis"});
+const redisClient = redisAsync.createClient({host: `redis-${process.env.DATABASE}`});
 Log.enableAll();
 app.use(fileUpload({
   limits: {
@@ -23,14 +23,14 @@ app.use(fileUpload({
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);
-mongoose.connect("mongodb://mongo/MEDIA_SERVICE", {useNewUrlParser: true});
+mongoose.connect(`mongodb://mongo-${process.env.DATABASE}/${process.env.DATABASE}`, {useNewUrlParser: true});
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
 
-app.use(express.static("/app/files"));
+app.use("/files", express.static("files"));
 
 app.post("/upload", async (req, res) => {
-  if (req.get("x-access-key") !== "MAJE@O93I2G5#XX074*!") {
+  if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
   if (!fs.existsSync("/app/files")) {
@@ -63,7 +63,7 @@ app.post("/upload", async (req, res) => {
 });
 
 app.get("/find", async (req, res) => {
-  if (req.get("x-access-key") !== "MAJE@O93I2G5#XX074*!") {
+  if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
   return await res.json(await FileModel.find({}, {name: 1, _id: 0}));

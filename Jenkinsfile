@@ -5,7 +5,7 @@ pipeline {
       args "--name media-service \
             --network restaurantetic \
             -p 9090:9090 \
-            -v /var/www/media.unixjs.com.co/files:/app/files"
+            -v /var/www/media.restaurantetic.com/files:/app/files"
     }
   }
   stages {
