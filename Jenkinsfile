@@ -6,8 +6,8 @@ pipeline {
             --network restaurantetic \
             -p 9090:9090 \
             -v /var/www/media.restaurantetic.com/files:/app/files \
-            -e DATABASE=${env.MEDIA_RESTAURANTIC_DATABASE} \
-            -e KEY=${env.MEDIA_RESTAURANTIC_KEY}"
+            -e DATABASE=${env.MEDIA_RESTAURANTETIC_DATABASE} \
+            -e KEY=${env.MEDIA_RESTAURANTETIC_KEY}"
     }
   }
   stages {
