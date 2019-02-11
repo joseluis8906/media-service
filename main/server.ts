@@ -62,6 +62,10 @@ app.post("/upload", async (req, res) => {
   }
 });
 
+app.get("/", async (_, res) => {
+  return await res.send("media service");
+});
+
 app.get("/find", async (req, res) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
