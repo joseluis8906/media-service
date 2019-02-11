@@ -73,9 +73,5 @@ app.get("/find", async (req, res) => {
   return await res.json(await FileModel.find({}, {name: 1, _id: 0}));
 });
 
-app.get("/", async (_, res) => {
-  return await res.send("media server");
-});
-
 app.use(express.static("files"));
 app.listen(port, () => Log.info(`Example app listening on port ${port}!`));
