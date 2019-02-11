@@ -27,7 +27,7 @@ mongoose.connect(`mongodb://mongo-${process.env.DATABASE}/${process.env.DATABASE
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
 
-app.use("/files", express.static("files"));
+app.use("/files", express.static("/app/files"));
 
 app.post("/upload", async (req, res) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
