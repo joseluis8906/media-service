@@ -6,7 +6,9 @@ pipeline {
             --network restaurantetic \
             -p 9090:9090 \
             -v /var/www/media.restaurantetic.com/files:/app/files \
-            -e DATABASE=${env.MEDIA_RESTAURANTETIC_DATABASE} \
+            -e MONGO_RESTAURANTETIC_HOST=mongo-media-restaurantetic \
+            -e MONGO_RESTAURANTETIC_DB=restaurantetic \
+            -e REDIS_RESTAURANTETIC_HOST=redis-media-restaurantetic \
             -e KEY=${env.MEDIA_RESTAURANTETIC_KEY}"
     }
   }

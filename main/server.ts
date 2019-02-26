@@ -1,5 +1,6 @@
 import bluebird from "bluebird";
-import express from "express";
+import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
 import fs from "fs";
 import lodash from "lodash";
@@ -10,9 +11,11 @@ import * as redis from "redis";
 import { FileSchema } from "./fileSchema";
 
 const app = express();
+app.use(bodyParser.json());
+
 const port = 9090;
 const redisAsync: any = bluebird.promisifyAll(redis);
-const redisClient = redisAsync.createClient({host: `redis-${process.env.DATABASE}`});
+const redisClient = redisAsync.createClient({host: `${process.env.REDIS_RESTAURANTETIC_HOST}`});
 Log.enableAll();
 app.use(fileUpload({
   limits: {
@@ -23,13 +26,13 @@ app.use(fileUpload({
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);
-mongoose.connect(`mongodb://mongo-${process.env.DATABASE}/${process.env.DATABASE}`, {useNewUrlParser: true});
+mongoose.connect(`mongodb://${process.env.MONGO_RESTAURANTETIC_HOST}/${process.env.MONGO_RESTAURANTETIC_DB}`, {useNewUrlParser: true});
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
 
 app.use("/files", express.static("/app/files"));
 
-app.post("/upload", async (req, res) => {
+app.post("/", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
@@ -55,22 +58,31 @@ app.post("/upload", async (req, res) => {
       name: `${next.toString()}.${ext}`,
     });
     await fileDb.save();
-    return await res.send("uploaded.");
+    return await res.send(`${next.toString()}.${ext}`);
 
   } catch (err) {
     return await res.send("Error processing file. " + err.message);
   }
 });
 
-app.get("/", async (_, res) => {
-  return await res.send("media service");
-});
-
-app.get("/find", async (req, res) => {
+app.get("/", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
   return await res.json(await FileModel.find({}, {name: 1, _id: 0}));
+});
+
+app.delete("/", async (req: Request, res: Response) => {
+  if (req.get("x-access-key") !== `${process.env.KEY}`) {
+    return await res.status(401).send("Wrog key or not suplied.");
+  }
+  if (fs.existsSync(`/app/files/${req.body.file}`)) {
+    await fs.unlinkSync(`/app/files/${req.body.file}`);
+    await FileModel.findOneAndRemove({name: `${req.body.file}`});
+    return res.send(`${req.body.file} Deleted`);
+  } else {
+    return res.status(404).send("File not found");
+  }
 });
 
 app.use(express.static("files"));
