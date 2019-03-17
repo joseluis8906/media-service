@@ -32,6 +32,12 @@ const FileModel = new FileSchema().getModelForClass(FileSchema);
 
 app.use("/files", express.static("/app/files"));
 
+app.use((_: Request, res: Response, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-key");
+  next();
+});
+
 app.post("/", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
