@@ -64,10 +64,10 @@ app.post("/", async (req: Request, res: Response) => {
       name: `${next.toString()}.${ext}`,
     });
     await fileDb.save();
-    return await res.send(`${next.toString()}.${ext}`);
+    return await res.set("Content-Type", "text/plain").send(`${next.toString()}.${ext}`);
 
   } catch (err) {
-    return await res.send("Error processing file. " + err.message);
+    return await res.set("Content-Type", "text/plain").send("Error processing file. " + err.message);
   }
 });
 
@@ -85,9 +85,9 @@ app.delete("/", async (req: Request, res: Response) => {
   if (fs.existsSync(`/app/files/${req.body.file}`)) {
     await fs.unlinkSync(`/app/files/${req.body.file}`);
     await FileModel.findOneAndRemove({name: `${req.body.file}`});
-    return res.send(`${req.body.file} Deleted`);
+    return res.set("Content-Type", "text/plain").send(`${req.body.file} Deleted`);
   } else {
-    return res.status(404).send("File not found");
+    return res.set("Content-Type", "text/plain").status(404).send("File not found");
   }
 });
 
