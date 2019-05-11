@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 const port = 9090;
 const redisAsync: any = bluebird.promisifyAll(redis);
-const redisClient = redisAsync.createClient({host: `${process.env.REDIS_RESTAURANTETIC_HOST}`});
+const redisClient = redisAsync.createClient({host: `${process.env.REDIS_HOST}`});
 Log.enableAll();
 app.use(fileUpload({
   limits: {
@@ -26,11 +26,9 @@ app.use(fileUpload({
 
 mongoose.Promise = global.Promise;
 mongoose.set("useCreateIndex", true);
-mongoose.connect(`mongodb://${process.env.MONGO_RESTAURANTETIC_HOST}/${process.env.MONGO_RESTAURANTETIC_DB}`, {useNewUrlParser: true});
+mongoose.connect(`mongodb://${process.env.MONGO_HOST}/${process.env.MONGO_DB}`, {useNewUrlParser: true});
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
-
-app.use("/files", express.static("/app/files"));
 
 app.use((_: Request, res: Response, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -38,7 +36,7 @@ app.use((_: Request, res: Response, next) => {
   next();
 });
 
-app.post("/", async (req: Request, res: Response) => {
+app.post("/media", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
@@ -71,14 +69,14 @@ app.post("/", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/", async (req: Request, res: Response) => {
+app.get("/media", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
   return await res.json(await FileModel.find({}, {name: 1, _id: 0}));
 });
 
-app.delete("/", async (req: Request, res: Response) => {
+app.delete("/media", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
     return await res.status(401).send("Wrog key or not suplied.");
   }
@@ -91,5 +89,4 @@ app.delete("/", async (req: Request, res: Response) => {
   }
 });
 
-app.use(express.static("files"));
 app.listen(port, () => Log.info(`Example app listening on port ${port}!`));
