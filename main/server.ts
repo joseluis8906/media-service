@@ -13,7 +13,9 @@ import { FileSchema } from "./fileSchema";
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+  origin: "*"
+}));
 
 const port = 9090;
 const redisAsync: any = bluebird.promisifyAll(redis);
@@ -32,11 +34,11 @@ mongoose.connect(`mongodb://${process.env.MONGO_HOST}/${process.env.MONGO_DB}`, 
 
 const FileModel = new FileSchema().getModelForClass(FileSchema);
 
-app.use((_: Request, res: Response, next) => {
+/*app.use((_: Request, res: Response, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-key");
   next();
-});
+});*/
 
 app.post("/media", async (req: Request, res: Response) => {
   if (req.get("x-access-key") !== `${process.env.KEY}`) {
