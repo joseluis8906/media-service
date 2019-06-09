@@ -13,7 +13,7 @@ import { FileSchema } from "./fileSchema";
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors({}));
+//app.use(cors({}));
 
 const port = 9090;
 const redisAsync: any = bluebird.promisifyAll(redis);
