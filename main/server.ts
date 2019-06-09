@@ -1,5 +1,5 @@
 import bluebird from "bluebird";
-import cors from "cors";
+//import cors from "cors";
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import fileUpload from "express-fileupload";
