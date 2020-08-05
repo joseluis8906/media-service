@@ -16,7 +16,7 @@
     "bluebird": "^3.5.3",
     "cors": "2.8.5",
     "express": "4.16.4",
-    "express-fileupload": "1.1.1-alpha.1",
+    "express-fileupload": "1.1.9",
     "lodash": "^4.17.11",
     "loglevel": "^1.6.1",
     "moment-timezone": "0.5.23",
